@@ -1,6 +1,6 @@
 local harpoon = require("harpoon")
 local popup = require("plenary.popup")
-local utils = require("harpoon.utils")
+local string_utils = require("harpoon.utils.string")
 local log = require("harpoon.dev").log
 local term = require("harpoon.term")
 
@@ -60,7 +60,7 @@ local function get_menu_items()
     local indices = {}
 
     for _, line in pairs(lines) do
-        if not utils.is_white_space(line) then
+        if not string_utils.is_white_space(line) then
             table.insert(indices, line)
         end
     end

@@ -1,5 +1,5 @@
 local Path = require("plenary.path")
-local utils = require("harpoon.utils")
+local path_utils = require("harpoon.utils.path")
 local Dev = require("harpoon.dev")
 local log = Dev.log
 
@@ -97,7 +97,7 @@ local function ensure_correct_config(config)
             marks[idx] = mark
         end
 
-        marks[idx].filename = utils.normalize_path(mark.filename)
+        marks[idx].filename = path_utils.normalize_path(mark.filename)
     end
 
     return config

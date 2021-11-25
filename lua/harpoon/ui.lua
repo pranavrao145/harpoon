@@ -1,7 +1,7 @@
 local harpoon = require("harpoon")
 local popup = require("plenary.popup")
-local Marked = require("harpoon.mark")
-local utils = require("harpoon.utils")
+local mark = require("harpoon.mark")
+local string_utils = require("harpoon.utils.string")
 local log = require("harpoon.dev").log
 
 local M = {}
@@ -62,7 +62,7 @@ local function get_menu_items()
     local indices = {}
 
     for _, line in pairs(lines) do
-        if not utils.is_white_space(line) then
+        if not string_utils.is_white_space(line) then
             table.insert(indices, line)
         end
     end
@@ -84,8 +84,8 @@ M.toggle_quick_menu = function()
     Harpoon_win_id = win_info.win_id
     Harpoon_bufh = win_info.bufnr
 
-    for idx = 1, Marked.get_length() do
-        local file = Marked.get_marked_file_name(idx)
+    for idx = 1, mark.get_length() do
+        local file = mark.get_marked_file_name(idx)
         if file == "" then
             file = "(empty)"
         end
@@ -152,36 +152,36 @@ end
 
 M.on_menu_save = function()
     log.trace("on_menu_save()")
-    Marked.set_mark_list(get_menu_items())
+    mark.set_mark_list(get_menu_items())
 end
 
-M.nav_file = function(id)
-    log.trace("nav_file(): Navigating to", id)
-    local idx = Marked.get_index_of(id)
-    if not Marked.valid_index(idx) then
-        log.debug("nav_file(): No mark exists for id", id)
+M.nav_file = function(idx)
+    log.trace("nav_file(): Navigating to", idx)
+    local index = mark.get_index_of(idx)
+    if not mark.valid_index(index) then
+        log.debug("nav_file(): No mark exists for id", index)
         return
     end
 
-    local mark = Marked.get_marked_file(idx)
-    local buf_id = vim.fn.bufnr(mark.filename, true)
+    local file_mark = mark.get_marked_file(index)
+    local buf_id = vim.fn.bufnr(file_mark.filename, true)
     local set_row = not vim.api.nvim_buf_is_loaded(buf_id)
 
     vim.api.nvim_set_current_buf(buf_id)
     vim.api.nvim_buf_set_option(buf_id, "buflisted", true)
-    if set_row and mark.row and mark.col then
-        vim.cmd(string.format(":call cursor(%d, %d)", mark.row, mark.col))
+    if set_row and file_mark.row and file_mark.col then
+        vim.cmd(string.format(":call cursor(%d, %d)", file_mark.row, file_mark.col))
         log.debug(
             string.format(
                 "nav_file(): Setting cursor to row: %d, col: %d",
-                mark.row,
-                mark.col
+                file_mark.row,
+                file_mark.col
             )
         )
     end
 end
 
-function M.location_window(options)
+M.location_window = function(options)
     local default_options = {
         relative = "editor",
         style = "minimal",
@@ -201,7 +201,7 @@ function M.location_window(options)
     }
 end
 
-function M.notification(text)
+M.notification = function(text)
     local win_stats = vim.api.nvim_list_uis()[1]
     local win_width = win_stats.width
 
@@ -229,14 +229,14 @@ function M.notification(text)
     }
 end
 
-function M.close_notification(bufnr)
+M.close_notification = function(bufnr)
     vim.api.nvim_buf_delete(bufnr)
 end
 
 M.nav_next = function()
     log.trace("nav_next()")
-    local current_index = Marked.get_current_index()
-    local number_of_items = Marked.get_length()
+    local current_index = mark.get_current_index()
+    local number_of_items = mark.get_length()
 
     if current_index == nil then
         current_index = 1
@@ -252,8 +252,8 @@ end
 
 M.nav_prev = function()
     log.trace("nav_prev()")
-    local current_index = Marked.get_current_index()
-    local number_of_items = Marked.get_length()
+    local current_index = mark.get_current_index()
+    local number_of_items = mark.get_length()
 
     if current_index == nil then
         current_index = number_of_items

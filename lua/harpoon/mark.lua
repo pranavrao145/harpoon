@@ -1,5 +1,5 @@
 local harpoon = require("harpoon")
-local utils = require("harpoon.utils")
+local path_utils = require("harpoon.utils.path")
 local log = require("harpoon.dev").log
 
 -- I think that I may have to organize this better.  I am not the biggest fan
@@ -58,9 +58,9 @@ end
 local function get_buf_name(id)
     log.trace("_get_buf_name():", id)
     if id == nil then
-        return utils.normalize_path(vim.api.nvim_buf_get_name(0))
+        return path_utils.normalize_path(vim.api.nvim_buf_get_name(0))
     elseif type(id) == "string" then
-        return utils.normalize_path(id)
+        return path_utils.normalize_path(id)
     end
 
     local idx = M.get_index_of(id)
@@ -149,7 +149,7 @@ M.get_index_of = function(item)
     end
 
     if type(item) == "string" then
-        local relative_item = utils.normalize_path(item)
+        local relative_item = path_utils.normalize_path(item)
         for idx = 1, M.get_length() do
             if M.get_marked_file_name(idx) == relative_item then
                 return idx
@@ -181,7 +181,7 @@ M.status = function(bufnr)
         buf_name = vim.api.nvim_buf_get_name(0)
     end
 
-    local norm_name = utils.normalize_path(buf_name)
+    local norm_name = path_utils.normalize_path(buf_name)
     local idx = M.get_index_of(norm_name)
 
     if M.valid_index(idx) then

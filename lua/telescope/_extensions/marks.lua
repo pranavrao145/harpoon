@@ -1,4 +1,3 @@
-local action_set = require("telescope.actions.set")
 local action_state = require("telescope.actions.state")
 local entry_display = require("telescope.pickers.entry_display")
 local finders = require("telescope.finders")
